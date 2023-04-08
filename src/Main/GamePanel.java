@@ -11,12 +11,12 @@ import Tile.TileManager;
 import entity.Player;
 
 public class GamePanel extends JPanel implements Runnable{
-	final int originalTileSize = 32;  //32 * 32
-	final int scale = 1;
+	final int originalTileSize = 16;  //32 * 32
+	final int scale = 2;
 	
 	public final int tileSize = originalTileSize * scale; //64 * 64
-	final int maxScreenCol = 32;
-	final int maxScreenRow = 18;
+	public final int maxScreenCol = 32;
+	public final int maxScreenRow = 18;
 	final int screenWidth = tileSize * maxScreenCol; // 768px
 	final int screenHeight = tileSize * maxScreenRow; // 565px
 	
@@ -25,16 +25,16 @@ public class GamePanel extends JPanel implements Runnable{
 	KeyHandler keyH = new KeyHandler();
 	Thread gameThread;
 	Player player = new Player(this, keyH);
-	
+	public CollisionChecker cCollision = new CollisionChecker(this);
 	//player default position
 	
-	int playerX = 100;
-	int playerY = 100;
-	int playerSpeed = 3;
+//	int playerX = 100;
+//	int playerY = tileSize*(maxScreenRow - 1);
+//	int playerSpeed = 3;
 	
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
-		this.setBackground(Color.cyan);
+		this.setBackground(Color.decode("#81A0FF"));
 		this.setDoubleBuffered(true);
 		this.addKeyListener(keyH);
 		this.setFocusable(true);
