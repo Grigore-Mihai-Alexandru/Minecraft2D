@@ -11,26 +11,38 @@ import Tile.TileManager;
 import entity.Player;
 
 public class GamePanel extends JPanel implements Runnable{
+	
+	private static final long serialVersionUID = 1L;
 	final int originalTileSize = 16;  //32 * 32
 	final int scale = 2;
 	
 	public final int tileSize = originalTileSize * scale; //64 * 64
 	public final int maxScreenCol = 32;
+	
 	public final int maxScreenRow = 18;
-	final int screenWidth = tileSize * maxScreenCol; // 768px
-	final int screenHeight = tileSize * maxScreenRow; // 565px
+	public final int screenWidth = tileSize * maxScreenCol; // 768px
+    public final int screenHeight = tileSize * maxScreenRow; // 565px
+	//word settings
+	public final int maxWorldCol =100;
+	public final int maxWorldRow =100 ;
+	public final int worldWidth = tileSize * maxWorldCol;
+	public final int worldHeight = tileSize * maxWorldRow;
+	
+	
+	
 	
 	int FPS = 60;
 	TileManager tileM = new TileManager(this);
 	KeyHandler keyH = new KeyHandler();
 	Thread gameThread;
-	Player player = new Player(this, keyH);
+	public Player player = new Player(this, keyH);
 	public CollisionChecker cCollision = new CollisionChecker(this);
 	//player default position
 	
-//	int playerX = 100;
-//	int playerY = tileSize*(maxScreenRow - 1);
-//	int playerSpeed = 3;
+	int playerX = 100;
+	int playerY = tileSize*(maxScreenRow - 1 );
+	int playerSpeed = 3;
+
 	
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
