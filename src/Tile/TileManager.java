@@ -4,22 +4,29 @@ import Main.GamePanel;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
 
+import entity.Player;
 public class TileManager {
 	GamePanel gp;
-	Tile[] tile;
-
+	public Tile[] tile;
+public int mapTileNum[][];
 	public TileManager (GamePanel  gp) {
 		
 		this.gp = gp;
 		tile = new Tile[10];	
-		
+		 mapTileNum = new int [gp.maxWorldCol][gp.maxWorldRow];
 		getTileImage();
+	loadMap("/map/world.txt");
 	}
 	
+	
+
 	public void getTileImage() {
 			
 			try {
@@ -31,15 +38,78 @@ public class TileManager {
 				e.printStackTrace();
 			}
 		
-	}
-	public void draw(Graphics g2) {
+	
+	
 		
-		for(int i=0; i<gp.maxScreenCol; i++) {
-			g2.drawImage(tile[0].image,i*gp.tileSize,gp.tileSize*(gp.maxScreenRow - 3),gp.tileSize, gp.tileSize,null);//dirt
-		}
-		for(int i=0; i<gp.maxScreenCol; i++) {
-			g2.drawImage(tile[1].image,i*gp.tileSize,gp.tileSize*(gp.maxScreenRow - 2),gp.tileSize, gp.tileSize,null); //stone
-			g2.drawImage(tile[1].image,i*gp.tileSize,gp.tileSize*(gp.maxScreenRow - 1),gp.tileSize, gp.tileSize,null); //stone
-		}
+		
+		
+
+	
+	
+	
+	}
+	public void loadMap(String filepath) {
+		
+try {
+	InputStream is = getClass().getResourceAsStream(filepath);
+	BufferedReader br = new BufferedReader(new InputStreamReader(is));
+int col=0;
+int row=0;
+while(col<gp.maxWorldCol&& row <gp.maxWorldRow) {
+	
+	String line=br.readLine();
+	while(col<gp.maxWorldCol) {
+		
+		String numbers[]=line.split(" ");
+		
+		int num = Integer.parseInt(numbers[row]);
+		
+		mapTileNum[row][col] = num;
+		col++;
+		
+	}
+	
+	if(col ==gp.maxWorldCol) {
+	col=0;
+	row++;
+	
 	}
 }
+
+br.close();
+}catch(Exception e) {}
+
+	}
+	
+	public void draw(Graphics g2) {
+	    int col = 0;
+	    int row = 0;
+	    while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
+	        int tileNum = mapTileNum[col][row];
+	        int worldX = col * gp.tileSize;
+	        int worldY = row * gp.tileSize;
+	        int screenX = worldX - gp.player.worldX + gp.player.screenX/5;
+	        int screenY = worldY - gp.player.worldY + gp.player.screenY/5;
+	        
+	        if (row == 0) {
+	            g2.drawImage(tile[0].image, screenX, screenY, gp.tileSize, gp.tileSize, null); // tile[0]
+	        } else if (row <= 3) {
+	            g2.drawImage(tile[1].image, screenX, screenY, gp.tileSize, gp.tileSize, null); // tile[1]
+	        } else {
+	            break; // ieșim din bucla while după ce am afișat cele patru rânduri
+	        }
+	        
+	        col++;
+	        if (col == gp.maxWorldCol) {
+	            col = 0;
+	            row++;
+	        }
+	    }
+	        }
+	    
+	}
+
+				
+			
+		
+	
