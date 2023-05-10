@@ -17,5 +17,15 @@ public class Entity {
 	public int spriteCounter = 1;
 	public int spriteNum = 0;
 	
+	public int jumpCounter = 1;
+	
+	protected boolean falling = true;
+	
+	protected int jumpStrength;
+	protected int weight;
+	
+	protected int gravity = 9;
+	
+	public int floorHeight;
 	
 }

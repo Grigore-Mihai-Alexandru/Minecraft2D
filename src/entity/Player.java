@@ -21,32 +21,36 @@ public class Player extends Entity{
 	public final int screenX;
 	public final int screenY;
 	public int worldX;
-	public int  worldY;
+	public int worldY;
+	private String prevAction;
 	
 	public Player(GamePanel gp, KeyHandler keyH) {
 		this.gp = gp;
 		this.keyH = keyH;
 		
-		solidArea = new Rectangle(4,0,6,6);
-		solidArea.x=8;
-		solidArea.y=16;
-		solidArea.width=32;
-		solidArea.height=32;
-		screenX= 100;
-		screenY=400;
+		solidArea = new Rectangle();
+		solidArea.x = 3;
+		solidArea.y = 4;
+		solidArea.width = 10;
+		solidArea.height = 28;
+		
+		screenX = 400;
+		screenY = 400;
 		
 		SetDefaultValues();
 	}
 	public void SetDefaultValues () {
-		worldX=gp.tileSize*23;
-	worldY=gp.tileSize*21;
+		worldX = gp.tileSize*gp.maxScreenCol/2;
+		worldY = 0;
 		
-	speed = 4;
+		floorHeight = 0;
+		jumpStrength = 0;
+		weight = 2;
+		speed = 4;
 		direction = "right";
 	}
 	
 	public void getPlayerImage() {
-		
 		try {
 			left = ImageIO.read(getClass().getResourceAsStream("/player/steve_left.png"));
 			right = ImageIO.read(getClass().getResourceAsStream("/player/steve_right.png"));
@@ -60,33 +64,62 @@ public class Player extends Entity{
 		}
 	}
 	
+	//update or ticks function
 	public void update() {
 		
 		if(keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true) {
 			
 			if(keyH.upPressed == true) {
 				action = "jump";
-				worldY -= speed;
 			}
 			if(keyH.downPressed == true) {
 				action = "crouch";
-			worldY += speed;
 			}
 			if(keyH.leftPressed == true) {
 				direction = "left";
-				worldX-= speed;
 			}
 			if(keyH.rightPressed == true) {
 				direction = "right";
-				worldX += speed;
 			}
 			
 			collisionOn = false;
 			gp.cCollision.checkTile(this);
 			
+			if(collisionOn == false) {
+				switch(direction) {
+				case "left":
+					if(keyH.leftPressed == true)
+						worldX-= speed;
+					break;
+				case "right":
+					if(keyH.rightPressed == true)
+						worldX += speed;
+					break;
+				}
+				if(action != null) {
+					switch(action) {
+					case "jump":
+						if(worldY >= floorHeight && jumpCounter > 20) {
+							jumpStrength = 14;
+							jumpCounter = 1;
+						}
+						break;
+					case "crouch":
+						speed = 2;
+						break;
+					}
+				}
+				if(speed == 2 && keyH.downPressed == false)
+					speed = 4;
+				prevAction = action;
+				action = null;
+				
+			}
+						
+			//changing walking image based on keyHold
 			spriteCounter++;
 			
-			if(spriteCounter > 10) {
+			if(spriteCounter > 10 ) {
 				if(spriteNum == 0) {
 					spriteNum = 1;
 				}else if(spriteNum == 1) {
@@ -100,6 +133,23 @@ public class Player extends Entity{
 			spriteNum = 0;
 		}
 		
+		// jumpCounter for jumping delay
+		jumpCounter++;
+		
+		//gravity implementation
+		if(falling && jumpStrength == 0) {
+			System.out.println(worldY );
+			if(worldY + gravity >= floorHeight)
+				worldY = floorHeight;
+			else 
+				worldY += gravity;
+			
+		}
+		if(jumpStrength >= 0) {			
+			worldY -= jumpStrength;
+			jumpStrength -= weight;
+		}else if(jumpStrength <= 0)
+			jumpStrength = 0;
 	}
 	
 	public void draw(Graphics g2) {
@@ -109,21 +159,21 @@ public class Player extends Entity{
 
 		switch(direction) {
 		case "left" :
-			if(action == "jump") {
+			if(prevAction == "jump" && keyH.leftPressed == false) {
+				image = left;
+				// add another else if for crouch action here!
+			}else if(spriteNum == 1) {
+				image = walk_1_left;
+			}else if(spriteNum == 2){
 				image = walk_2_jump_left;
-			}else {
-				if(spriteNum == 1) {
-					image = walk_1_left;
-				}else if(spriteNum == 0){
-					image = left;
-				}else if(spriteNum == 2){
-					image = walk_2_jump_left;
-				}
+			}else if(spriteNum == 0){
+				image = left;
 			}
 			break;
 		case "right" :
-			if(action == "jump") {
-				image = walk_2_jump_right;
+			if(prevAction == "jump" && keyH.rightPressed == false) {
+				image = right;
+				// same here
 			}else {
 				if(spriteNum == 1) {
 					image = walk_1_right;
