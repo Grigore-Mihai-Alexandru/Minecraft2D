@@ -21,7 +21,7 @@ public class Entity {
 	
 	protected boolean falling = true;
 	
-	protected int jumpStrength;
+	public int jumpStrength;
 	protected int weight;
 	
 	protected int gravity = 9;
