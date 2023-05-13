@@ -20,8 +20,6 @@ public class Player extends Entity{
 	KeyHandler keyH;
 	public final int screenX;
 	public final int screenY;
-	public int worldX;
-	public int worldY;
 	private String prevAction;
 	
 	public Player(GamePanel gp, KeyHandler keyH) {
@@ -31,8 +29,9 @@ public class Player extends Entity{
 		solidArea = new Rectangle();
 		solidArea.x = 3;
 		solidArea.y = 4;
-		solidArea.width = 10;
+		solidArea.width = 26;
 		solidArea.height = 28;
+		
 		
 		screenX = 400;
 		screenY = 400;
@@ -40,7 +39,7 @@ public class Player extends Entity{
 		SetDefaultValues();
 	}
 	public void SetDefaultValues () {
-		worldX = gp.tileSize*gp.maxScreenCol/2;
+		worldX = 0;
 		worldY = 0;
 		
 		floorHeight = 0;
@@ -85,11 +84,12 @@ public class Player extends Entity{
 			collisionOn = false;
 			gp.cCollision.checkTile(this);
 			
+			
 			if(collisionOn == false) {
 				switch(direction) {
 				case "left":
 					if(keyH.leftPressed == true)
-						worldX-= speed;
+						worldX -= speed;
 					break;
 				case "right":
 					if(keyH.rightPressed == true)
@@ -99,7 +99,7 @@ public class Player extends Entity{
 				if(action != null) {
 					switch(action) {
 					case "jump":
-						if(worldY >= floorHeight && jumpCounter > 20) {
+						if(worldY >= floorHeight && jumpCounter > 25) {
 							jumpStrength = 14;
 							jumpCounter = 1;
 						}
@@ -129,6 +129,7 @@ public class Player extends Entity{
 				}
 				spriteCounter = 1;
 			}
+			
 		}else {
 			spriteNum = 0;
 		}
@@ -138,18 +139,18 @@ public class Player extends Entity{
 		
 		//gravity implementation
 		if(falling && jumpStrength == 0) {
-			System.out.println(worldY );
 			if(worldY + gravity >= floorHeight)
 				worldY = floorHeight;
-			else 
-				worldY += gravity;
-			
+			else
+				worldY += gravity*3/2;
 		}
-		if(jumpStrength >= 0) {			
+		if(jumpStrength >= 0) {
 			worldY -= jumpStrength;
 			jumpStrength -= weight;
 		}else if(jumpStrength <= 0)
 			jumpStrength = 0;
+
+		gp.cCollision.checkFloor(this);
 	}
 	
 	public void draw(Graphics g2) {
