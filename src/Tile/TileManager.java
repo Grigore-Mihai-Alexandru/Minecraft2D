@@ -3,7 +3,6 @@ package Tile;
 import Main.GamePanel;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,13 +10,14 @@ import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
 
-import entity.Player;
 public class TileManager {
-	GamePanel gp;
-	public Tile[] tile;
-	public int mapTileNum[][];
+	public GamePanel gp;
+	public static Tile[] tile;
+	public static int mapTileNum[][];
+	int worldMaxCol;
+	int worldMaxRow;
 	
-	public TileManager (GamePanel  gp) {
+	public TileManager (GamePanel gp) {
 		this.gp = gp;
 		tile = new Tile[10];	
 		mapTileNum = new int [gp.maxWorldCol][gp.maxWorldRow];
@@ -87,7 +87,16 @@ public class TileManager {
 	            col = 0;
 	            row++;
 	        }
+	        worldMaxCol = gp.maxScreenCol;
+	        worldMaxRow = gp.maxScreenRow;
 	    }
     }
-	    
+	
+	public static void breakBlock(int screenX, int screenY, int col, int row) {
+		//handle outside of border case
+		if(mapTileNum[row][col] != 0 && tile[mapTileNum[row][col]].breakable)
+			mapTileNum[row][col] = 0;
+	}
+	
+	
 }	

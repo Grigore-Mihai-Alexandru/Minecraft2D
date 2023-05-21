@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 
 import Tile.TileManager;
 import entity.Player;
+import entity.Zombie;
 
 public class GamePanel extends JPanel implements Runnable{
 	
@@ -24,7 +25,7 @@ public class GamePanel extends JPanel implements Runnable{
     public final int screenHeight = tileSize * maxScreenRow; // 565px
 	//world settings
 	public final int maxWorldCol = 20;
-	public final int maxWorldRow = 20 ;
+	public final int maxWorldRow = 20;
 	public final int worldWidth = tileSize * maxWorldCol;
 	public final int worldHeight = tileSize * maxWorldRow;
 	
@@ -32,10 +33,12 @@ public class GamePanel extends JPanel implements Runnable{
 	int FPS = 60;
 	TileManager tileM = new TileManager(this);
 	KeyHandler keyH = new KeyHandler();
+	MouseHandler mouseH = new MouseHandler();
 	Thread gameThread;
 	public CollisionChecker cCollision = new CollisionChecker(this);
-	public Player player = new Player(this, keyH);
-	
+	public Player player = new Player(this, keyH, mouseH);
+	public Zombie zombie = new Zombie(this);
+//	public MapGenerator generator = new MapGenerator();
 	
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -43,11 +46,14 @@ public class GamePanel extends JPanel implements Runnable{
 		this.setDoubleBuffered(true);
 		this.addKeyListener(keyH);
 		this.setFocusable(true);
+		this.addMouseListener(mouseH);
 	}
 	
 	public void startGameThread() {
 		gameThread = new Thread(this);
 		gameThread.start();
+//		generator.generateWorld();
+//		generator.saveWorldToFile("map.txt");
 	}
 	
 	@Override
@@ -79,8 +85,8 @@ public class GamePanel extends JPanel implements Runnable{
 	}
 	
 	public void update() {
-		
 		player.update();
+		zombie.update(player);
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -88,7 +94,7 @@ public class GamePanel extends JPanel implements Runnable{
 		Graphics g2 = (Graphics2D)g;
 		tileM.draw(g2);
 		player.draw(g2);
-		
+		zombie.draw(g2);
 		g2.dispose();
 	}
 	

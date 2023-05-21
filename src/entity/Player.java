@@ -1,37 +1,38 @@
 package entity;
 
-import java.awt.image.BufferedImage;
-
 import Main.KeyHandler;
+import Main.MouseHandler;
+import Main.GamePanel;
 
-import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
-import Main.GamePanel;
 
 public class Player extends Entity{
 
 	GamePanel gp;
 	KeyHandler keyH;
+	MouseHandler mouseH;
 	public final int screenX;
 	public final int screenY;
 	private String prevAction;
+	private int punchDelay = 20;
 	
-	public Player(GamePanel gp, KeyHandler keyH) {
+	public Player(GamePanel gp, KeyHandler keyH, MouseHandler mouseH) {
 		this.gp = gp;
 		this.keyH = keyH;
+		this.mouseH = mouseH;
 		
 		solidArea = new Rectangle();
 		solidArea.x = 3;
 		solidArea.y = 4;
 		solidArea.width = 26;
 		solidArea.height = 28;
-		
+		worldX = 0;
+		worldY = 0;
 		
 		screenX = 400;
 		screenY = 400;
@@ -57,7 +58,8 @@ public class Player extends Entity{
 			walk_1_right = ImageIO.read(getClass().getResourceAsStream("/player/steve_firstmove_right.png"));
 			walk_2_jump_left = ImageIO.read(getClass().getResourceAsStream("/player/steve_secondmove_jump_left.png"));
 			walk_2_jump_right = ImageIO.read(getClass().getResourceAsStream("/player/steve_secondmove_right.png"));
-			
+			punch_place_left = ImageIO.read(getClass().getResourceAsStream("/player/steve_punch_place_left.png"));
+			punch_place_right = ImageIO.read(getClass().getResourceAsStream("/player/steve_punch_place_right.png"));
 		}catch(IOException e ){
 			e.printStackTrace();		
 		}
@@ -65,7 +67,7 @@ public class Player extends Entity{
 	
 	//update or ticks function
 	public void update() {
-		
+		prevAction = null;
 		if(keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true) {
 			
 			if(keyH.upPressed == true) {
@@ -83,7 +85,6 @@ public class Player extends Entity{
 			
 			collisionOn = false;
 			gp.cCollision.checkTile(this);
-			
 			
 			if(collisionOn == false) {
 				switch(direction) {
@@ -109,12 +110,13 @@ public class Player extends Entity{
 						break;
 					}
 				}
+				// jumpCounter for jumping delay
+				jumpCounter++;
 				if(speed == 2 && keyH.downPressed == false)
 					speed = 4;
-				prevAction = action;
-				action = null;
-				
 			}
+			prevAction = action;
+			action = null;
 						
 			//changing walking image based on keyHold
 			spriteCounter++;
@@ -134,12 +136,9 @@ public class Player extends Entity{
 			spriteNum = 0;
 		}
 		
-		// jumpCounter for jumping delay
-		jumpCounter++;
-		
 		//gravity implementation
 		if(falling && jumpStrength == 0) {
-			if(worldY + gravity >= floorHeight)
+			if(worldY + gravity >= floorHeight) 
 				worldY = floorHeight;
 			else
 				worldY += gravity*3/2;
@@ -151,6 +150,9 @@ public class Player extends Entity{
 			jumpStrength = 0;
 
 		gp.cCollision.checkFloor(this);
+		
+		//mouse Listener
+		mouseListener();
 	}
 	
 	public void draw(Graphics g2) {
@@ -160,9 +162,10 @@ public class Player extends Entity{
 
 		switch(direction) {
 		case "left" :
-			if(prevAction == "jump" && keyH.leftPressed == false) {
+			if(prevAction == "punch" || punchDelay < 20) {
+				image = punch_place_left;
+			}else if(prevAction == "jump" && keyH.leftPressed == false) {
 				image = left;
-				// add another else if for crouch action here!
 			}else if(spriteNum == 1) {
 				image = walk_1_left;
 			}else if(spriteNum == 2){
@@ -172,9 +175,10 @@ public class Player extends Entity{
 			}
 			break;
 		case "right" :
-			if(prevAction == "jump" && keyH.rightPressed == false) {
+			if(prevAction == "punch" || punchDelay < 20) {
+				image = punch_place_right;
+			}else if(prevAction == "jump" && keyH.rightPressed == false) {
 				image = right;
-				// same here
 			}else {
 				if(spriteNum == 1) {
 					image = walk_1_right;
@@ -188,5 +192,31 @@ public class Player extends Entity{
 		}
 		
 		g2.drawImage(image, screenX, screenY, gp.tileSize, 2*gp.tileSize, null);
+	}
+	
+	private void mouseListener() {
+		int blockScreenX = (mouseH.mouseX-screenX)/gp.tileSize;
+		int blockScreenY = (mouseH.mouseY-screenY)/gp.tileSize;
+		int blockWorldX = (mouseH.mouseX - screenX + worldX)/gp.tileSize;
+		int blockWorldY = (mouseH.mouseY - screenY + worldY)/gp.tileSize - 2 ; // - player height in blocks
+		
+		punchDelay++;
+		if(mouseH.leftClicked) {
+			action = "punch";
+			if(blockScreenX < 5 && blockScreenY < 5)
+				Tile.TileManager.breakBlock(blockScreenX, blockScreenY, blockWorldX, blockWorldY);
+			mouseH.leftClicked = false;
+			punchDelay = 1;
+		}
+		if(punchDelay > 1000)
+			punchDelay = 20;
+	}
+	
+	//getters and setters
+	public int getX() {
+		return worldX;
+	}
+	public int getY() {
+		return worldY;
 	}
 }

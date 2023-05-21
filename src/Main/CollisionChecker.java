@@ -26,7 +26,6 @@ public class CollisionChecker {
 		switch(entity.direction) {
 		case "left":
 			if(entity.action == "jump") {
-				entity.collisionOn = false;
 				entityTopRow = (entityTopWorldY - entity.speed)/gp.tileSize - 2;
 				if(entityTopRow >= 0) {
 					tileNum1 = gp.tileM.mapTileNum[entityTopRow][entityLeftCol];
@@ -42,8 +41,9 @@ public class CollisionChecker {
 			entityLeftCol = (entityLeftWorldX - entity.speed)/gp.tileSize;
 			
 			if(entityLeftCol >= 0 && entityBottomRow >= 0) {
+				tileNum1 = gp.tileM.mapTileNum[entityTopRow][entityLeftCol];
 				tileNum2 = gp.tileM.mapTileNum[entityBottomRow][entityLeftCol];
-				if(tileNum2 != 0 && gp.tileM.tile[tileNum2].collision == true) {
+				if(tileNum2 != 0 && gp.tileM.tile[tileNum2].collision || tileNum1 != 0 && gp.tileM.tile[tileNum1].collision) {
 					entity.collisionOn = true;
 				}
 			}else
@@ -52,7 +52,6 @@ public class CollisionChecker {
 			
 		case "right":
 			if(entity.action == "jump") {
-				entity.collisionOn = false;
 				entityTopRow = (entityTopWorldY - entity.speed)/gp.tileSize - 2;
 				if(entityTopRow >= 0) {
 					tileNum1 = gp.tileM.mapTileNum[entityTopRow][entityLeftCol];
@@ -68,9 +67,9 @@ public class CollisionChecker {
 			entityRightCol = (entityRightWorldX + entity.speed)/gp.tileSize;
 			
 			if(entityRightCol < gp.maxWorldCol && entityBottomRow >= 0) {
+				tileNum1 = gp.tileM.mapTileNum[entityTopRow][entityRightCol];
 				tileNum2 = gp.tileM.mapTileNum[entityBottomRow][entityRightCol];
-
-				if(tileNum2 != 0 && gp.tileM.tile[tileNum2].collision == true) {
+				if(tileNum2 != 0 && gp.tileM.tile[tileNum2].collision || tileNum1 != 0 && gp.tileM.tile[tileNum1].collision) {
 					entity.collisionOn = true;
 				}
 			}else 
@@ -88,15 +87,17 @@ public class CollisionChecker {
 		int entityLeftCol = entityLeftWorldX/gp.tileSize;
 		int entityRightCol = entityRightWorldX/gp.tileSize;
 		
-		if(entityLeftCol >= 0 && entityRightCol >=0) {
-			int tileNum1 = gp.tileM.mapTileNum[entityBottomRow-1][entityLeftCol];
-			int tileNum2 = gp.tileM.mapTileNum[entityBottomRow-1][entityRightCol];
+		if(entityLeftCol >= 0 && entityRightCol >= 0) {
+			int tileNum1 = gp.tileM.mapTileNum[entityBottomRow - 1][entityLeftCol];
+			int tileNum2 = gp.tileM.mapTileNum[entityBottomRow - 1][entityRightCol];
 			
 			if((tileNum1 != 0 && gp.tileM.tile[tileNum1].collision) || (tileNum2 != 0 && gp.tileM.tile[tileNum2].collision)) {
-				entity.floorHeight = (entityBottomRow-1) * gp.tileSize;
+				entity.floorHeight = (entityBottomRow - 1) * gp.tileSize;
 			}else {
 				entity.floorHeight = entityBottomRow * gp.tileSize;
 			}
 		}
 	}
+	
+	
 }
