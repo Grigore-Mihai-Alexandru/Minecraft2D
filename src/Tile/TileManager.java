@@ -28,11 +28,30 @@ public class TileManager {
 	public void getTileImage() {
 		try {
 			tile[1] = new Tile();
-			tile[1].collision = true;
-            tile[2] = new Tile();
-            tile[2].collision = true;
-            tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grass_block.png"));
+			  tile[1].collision = true;
+      tile[2] = new Tile();
+        tile[2].collision = true;
+      tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grass_block.png"));
 			tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/stone.png"));
+      tile[3] = new Tile();
+        tile[3].collision = false;
+			  tile[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/oak_log.png"));
+      tile[4] = new Tile();
+        tile[4].collision = false;
+        tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/azalea_leaves.png"));
+      tile[5] = new Tile();
+        tile[5].collision = false;
+        tile[5].image = ImageIO.read(getClass().getResourceAsStream("/tiles/clouds.png"));
+      tile[6] = new Tile();
+		  	tile[6].collision = false;
+		    tile[6].image = ImageIO.read(getClass().getResourceAsStream("/tiles/iron_ore.png"));
+      tile[7] = new Tile();
+			  tile[7].collision = false;
+		    tile[7].image = ImageIO.read(getClass().getResourceAsStream("/tiles/coal_ore.png"));
+		  tile[8] = new Tile();
+			  tile[8].collision = false;
+		    tile[8].image = ImageIO.read(getClass().getResourceAsStream("/tiles/bedrock.png"));
+		
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -90,13 +109,12 @@ public class TileManager {
 	        worldMaxCol = gp.maxScreenCol;
 	        worldMaxRow = gp.maxScreenRow;
 	    }
-    }
+  }
 	
 	public static void breakBlock(int screenX, int screenY, int col, int row) {
 		//handle outside of border case
 		if(mapTileNum[row][col] != 0 && tile[mapTileNum[row][col]].breakable)
 			mapTileNum[row][col] = 0;
 	}
-	
-	
+  
 }	
