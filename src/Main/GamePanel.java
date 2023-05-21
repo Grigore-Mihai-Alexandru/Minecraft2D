@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import environment.EnvironmentManager;
 import Tile.TileManager;
 import entity.Player;
+import entity.Zombie;
 
 public class GamePanel extends JPanel implements Runnable{
     
@@ -21,6 +22,8 @@ public class GamePanel extends JPanel implements Runnable{
     public final int maxScreenRow = 18;
     public final int screenWidth = tileSize * maxScreenCol; // 768px
     public final int screenHeight = tileSize * maxScreenRow; // 565px
+
+
     //word settings
     public final int maxWorldCol =100;
     public final int maxWorldRow =100 ;
@@ -30,10 +33,13 @@ public class GamePanel extends JPanel implements Runnable{
     int FPS = 60;
     TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler();
+    MouseHandler mouseH = new MouseHandler();
     Thread gameThread;
     public Player player = new Player(this, keyH);
     public CollisionChecker cCollision = new CollisionChecker(this);
     EnvironmentManager eManager = new EnvironmentManager(this);
+	  public Zombie zombie = new Zombie(this);
+//	public MapGenerator generator = new MapGenerator();
     
     
     //player default position
@@ -49,6 +55,7 @@ public class GamePanel extends JPanel implements Runnable{
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+        this.addMouseListener(mouseH);
     }
     
     public void setup() {
@@ -60,6 +67,8 @@ public class GamePanel extends JPanel implements Runnable{
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
+//		generator.generateWorld();
+//		generator.saveWorldToFile("map.txt");
     }
     
     @Override
@@ -91,9 +100,8 @@ public class GamePanel extends JPanel implements Runnable{
     }
     
     public void update() {
-        
         player.update();
- 
+        zombie.update(player);
     }
     
     
@@ -102,8 +110,9 @@ public class GamePanel extends JPanel implements Runnable{
         Graphics2D g2 = (Graphics2D) g;
         tileM.draw(g2);
         player.draw(g2);
+        zombie.draw(g2);
         eManager.draw(g2); // Call the draw method of EnvironmentManager
         g2.dispose();
     }
-    
+  
 }
