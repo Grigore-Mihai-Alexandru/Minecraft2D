@@ -35,7 +35,7 @@ public class GamePanel extends JPanel implements Runnable{
     KeyHandler keyH = new KeyHandler();
     MouseHandler mouseH = new MouseHandler();
     Thread gameThread;
-    public Player player = new Player(this, keyH);
+    public Player player = new Player(this, keyH, mouseH);
     public CollisionChecker cCollision = new CollisionChecker(this);
     EnvironmentManager eManager = new EnvironmentManager(this);
 	  public Zombie zombie = new Zombie(this);
