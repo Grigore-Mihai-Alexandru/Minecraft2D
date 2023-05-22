@@ -40,12 +40,12 @@ public class Zombie extends Entity{
 	
 	public void getZombieImage() {
 		try {
-			left = ImageIO.read(getClass().getResourceAsStream("/player/steve_left.png"));
-			right = ImageIO.read(getClass().getResourceAsStream("/player/steve_right.png"));
-			walk_1_left = ImageIO.read(getClass().getResourceAsStream("/player/steve_firstmove_left.png"));
-			walk_1_right = ImageIO.read(getClass().getResourceAsStream("/player/steve_firstmove_right.png"));
-			walk_2_jump_left = ImageIO.read(getClass().getResourceAsStream("/player/steve_secondmove_jump_left.png"));
-			walk_2_jump_right = ImageIO.read(getClass().getResourceAsStream("/player/steve_secondmove_right.png"));
+			left = ImageIO.read(getClass().getResourceAsStream("/zombie/zombie_left.png"));
+			right = ImageIO.read(getClass().getResourceAsStream("/zombie/zombie_right.png"));
+			walk_1_left = ImageIO.read(getClass().getResourceAsStream("/zombie/zombie_moveleft1.png"));
+			walk_1_right = ImageIO.read(getClass().getResourceAsStream("/zombie/zombie_moveright1.png"));
+			walk_2_jump_left = ImageIO.read(getClass().getResourceAsStream("/zombie/zombie_moveleft2.png"));
+			walk_2_jump_right = ImageIO.read(getClass().getResourceAsStream("/zombie/zombie_moveright2.png"));
 			
 		}catch(IOException e ){
 			e.printStackTrace();		
@@ -93,17 +93,7 @@ public class Zombie extends Entity{
 		jumpCounter++;
 		
 		//gravity implementation
-		if(falling && jumpStrength == 0) {
-			if(worldY + gravity >= floorHeight)
-				worldY = floorHeight;
-			else 
-				worldY += gravity*3/2;
-		}
-		if(jumpStrength >= 0) {
-			worldY -= jumpStrength;
-			jumpStrength -= weight;
-		}else if(jumpStrength <= 0)
-			jumpStrength = 0;
+		gravity();
 
 		gp.cCollision.checkFloor(this);
 			
