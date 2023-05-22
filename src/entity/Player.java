@@ -60,6 +60,8 @@ public class Player extends Entity{
 			walk_2_jump_right = ImageIO.read(getClass().getResourceAsStream("/player/steve_secondmove_right.png"));
 			punch_place_left = ImageIO.read(getClass().getResourceAsStream("/player/steve_punch_place_left.png"));
 			punch_place_right = ImageIO.read(getClass().getResourceAsStream("/player/steve_punch_place_right.png"));
+			crouch_left= ImageIO.read(getClass().getResourceAsStream("/player/steve_crouch_left.png"));
+			crouch_right = ImageIO.read(getClass().getResourceAsStream("/player/steve_crouch_right.png"));
 		}catch(IOException e ){
 			e.printStackTrace();		
 		}
@@ -137,17 +139,7 @@ public class Player extends Entity{
 		}
 		
 		//gravity implementation
-		if(falling && jumpStrength == 0) {
-			if(worldY + gravity >= floorHeight) 
-				worldY = floorHeight;
-			else
-				worldY += gravity*3/2;
-		}
-		if(jumpStrength >= 0) {
-			worldY -= jumpStrength;
-			jumpStrength -= weight;
-		}else if(jumpStrength <= 0)
-			jumpStrength = 0;
+		gravity();
 
 		gp.cCollision.checkFloor(this);
 		
@@ -162,7 +154,9 @@ public class Player extends Entity{
 
 		switch(direction) {
 		case "left" :
-			if(prevAction == "punch" || punchDelay < 20) {
+			if(prevAction == "crouch" && keyH.downPressed) {
+				image = crouch_left;
+			}else if(prevAction == "punch" || punchDelay < 20) {
 				image = punch_place_left;
 			}else if(prevAction == "jump" && keyH.leftPressed == false) {
 				image = left;
@@ -175,7 +169,9 @@ public class Player extends Entity{
 			}
 			break;
 		case "right" :
-			if(prevAction == "punch" || punchDelay < 20) {
+			if(prevAction == "crouch") {
+				image = crouch_right;
+			}else if(prevAction == "punch" || punchDelay < 20) {
 				image = punch_place_right;
 			}else if(prevAction == "jump" && keyH.rightPressed == false) {
 				image = right;
