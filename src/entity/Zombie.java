@@ -12,10 +12,12 @@ import Main.GamePanel;
 public class Zombie extends Entity{
 
 	GamePanel gp;
+	private boolean moving = false;
+	int screenX, screenY;
+	int hitDelay = 1;
 	
 	public Zombie(GamePanel gp) {
 		this.gp = gp;
-		
 		solidArea = new Rectangle();
 		solidArea.x = 3;
 		solidArea.y = 4;
@@ -28,14 +30,14 @@ public class Zombie extends Entity{
 		SetDefaultValues();
 	}
 	public void SetDefaultValues () {
-		worldX = 0;
+		worldX = 100;
 		worldY = 0;
 		
 		floorHeight = 0;
 		jumpStrength = 0;
 		weight = 2;
-		speed = 4;
-		direction = "right";
+		speed = 2;
+		direction = "left";
 	}
 	
 	public void getZombieImage() {
@@ -61,70 +63,109 @@ public class Zombie extends Entity{
         int deltaY = playerY - worldY;
 
         // Update the zombie's position based on the direction
-        if (deltaX != 0) {
-        	worldX += deltaX / Math.abs(deltaX); // Move horizontally
+        if (deltaX != 0 && Math.abs(deltaX) < gp.tileSize * 10 ) {
+        	if(!collisionOn) {
+        		worldX += deltaX / Math.abs(deltaX); // Move horizontally
+        		moving = true;
+        	}else moving = false;
+        	if (worldX < player.worldX)
+        		direction = "right";
+        	else direction = "left";
         }
-        if (deltaY != 0) {
-        	worldY += deltaY / Math.abs(deltaY); // Move vertically
+        
+        if (deltaY < 0 && Math.abs(deltaX) < gp.tileSize * 10 && !jumpCollision) { // change based on collision of floorheight
+        	collisionOn = false;
+        	action = "jump";
         }
+        if(Math.abs(deltaX) >= gp.tileSize * 10 || Math.abs(deltaY) >= gp.tileSize * 10)
+        	moving = false;
     }
 	public void update(Player player) {
-		
-		collisionOn = false;
-//		gp.cCollision.checkTile(this);
-//		System.out.println(collisionOn);
-		//changing walking image based on keyHold
-		spriteCounter++;
-		
-		if(spriteCounter > 10 ) {
-			if(spriteNum == 0) {
-				spriteNum = 1;
-			}else if(spriteNum == 1) {
-				spriteNum = 2;
-			}else {
+		if(health > 0) {
+			collisionOn = false;
+			jumpCollision = false;
+			gp.cCollision.checkTile(this);
+			gp.cCollision.checkZombieJump(this);
+			
+			//changing walking image based on keyHold
+			if(collisionOn == false || jumpCollision == false) {
+				if(action == "jump") {
+					if(worldY >= floorHeight && jumpCounter > 55) {
+						jumpStrength = 14;
+						jumpCounter = 1;
+					}
+				}
+				jumpCounter++;
+				action = null;
+			}
+			
+			
+			if(moving) {
+				spriteCounter++;
+				if(spriteCounter > 20 ) {
+					if(spriteNum == 0) {
+						spriteNum = 1;
+					}else if(spriteNum == 1) {
+						spriteNum = 2;
+					}else {
+						spriteNum = 0;
+					}
+					spriteCounter = 1;
+				}
+			}
+			else {
 				spriteNum = 0;
 			}
-			spriteCounter = 1;
-		}else {
-			spriteNum = 0;
-		}
-		
-		// jumpCounter for jumping delay
-		jumpCounter++;
-		
-		//gravity implementation
-		gravity();
-
-		gp.cCollision.checkFloor(this);
 			
-		moveTowardsPlayer(player);
-		
+			// jumpCounter for jumping delay
+			jumpCounter++;
+			
+			//gravity implementation
+			gravity();
+	
+			gp.cCollision.checkFloor(this);
+			moveTowardsPlayer(player);
+			hitDelay++;
+			if(hitDelay > 70) {
+				hit(1,1,player,gp);
+				hitDelay = 1;
+			}
+		}
 	}
 	
 	public void draw(Graphics g2) {
 			
-			getZombieImage();
-			BufferedImage image = null;
-	
-			switch(direction) {
-			case "left" :
-				if(spriteNum == 1) {
+		getZombieImage();
+		BufferedImage image = null;
+		if(health > 0) {
+		switch(direction) {
+		case "left" :
+			if(spriteNum == 0 && !moving) {
+				image = left;
+			}else if(moving) {
+				if(spriteNum == 1)
 					image = walk_1_left;
-				}else if(spriteNum == 2){
+				else
 					image = walk_2_jump_left;
-				}else if(spriteNum == 0){
-					image = left;
-				}
-				break;
-			case "right" :
-				if(spriteNum == 1) {
+			}
+			break;
+		case "right" :
+			if(spriteNum == 0 && !moving) {
+				image = right;
+			}else if(moving) {
+				if(spriteNum == 1)
 					image = walk_1_right;
-				}else if(spriteNum == 0){
-					image = right;
-				}else if(spriteNum == 2){
+				else
 					image = walk_2_jump_right;
-				}
-				break;
+			}
+			break;
+		}
+
+        screenX = worldX - gp.player.worldX + gp.player.screenX;
+        screenY = worldY - gp.player.worldY + gp.player.screenY;
+        
+        
+		g2.drawImage(image, screenX, screenY, gp.tileSize, 2*gp.tileSize, null);
 		}
 	}
 }
