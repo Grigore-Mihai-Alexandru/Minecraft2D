@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
+
+import Inventory.MinecraftInventory;
+import Sound.Sound;
 import environment.EnvironmentManager;
 import Tile.TileManager;
 import entity.Player;
@@ -35,12 +38,15 @@ public class GamePanel extends JPanel implements Runnable{
     KeyHandler keyH = new KeyHandler();
     MouseHandler mouseH = new MouseHandler();
     Thread gameThread;
-    public Player player = new Player(this, keyH, mouseH);
     public CollisionChecker cCollision = new CollisionChecker(this);
     EnvironmentManager eManager = new EnvironmentManager(this);
     public Zombie zombie = new Zombie(this);
-//	public MapGenerator generator = new MapGenerator();
+    public Player player = new Player(this, keyH, mouseH, zombie);
     
+    public MinecraftInventory inventory = new MinecraftInventory(30);
+    public UI ui = new UI(this, player);
+    public Sound sound = new Sound();
+//	public MapGenerator generator = new MapGenerator(this);
     
     
     public GamePanel() {
@@ -57,12 +63,12 @@ public class GamePanel extends JPanel implements Runnable{
         eManager.setup(); // Call the setup method of EnvironmentManager
     }
     
-    
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
+        playMusic(1);
 //		generator.generateWorld();
-//		generator.saveWorldToFile("map.txt");
+//		generator.saveWorldToFile("./resources/map/map.txt");
     }
     
     @Override
@@ -106,7 +112,21 @@ public class GamePanel extends JPanel implements Runnable{
         player.draw(g2);
         zombie.draw(g2);
         eManager.draw(g2); // Call the draw method of EnvironmentManager
+        ui.draw(g2);
         g2.dispose();
     }
-  
+    
+    public void playMusic(int i) {
+    	sound.setFile(i);
+    	sound.play();
+    	sound.loop();
+    }
+    public void stopMusic() {
+    	sound.stop();
+    }
+    public void playSE(int i) {
+    	sound.setFile(i);
+    	sound.play();
+    }
+    
 }

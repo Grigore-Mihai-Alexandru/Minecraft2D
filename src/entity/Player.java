@@ -16,15 +16,17 @@ public class Player extends Entity{
 	GamePanel gp;
 	KeyHandler keyH;
 	MouseHandler mouseH;
+	Zombie zombie;
 	public final int screenX;
 	public final int screenY;
 	private String prevAction;
 	private int punchDelay = 20;
 	
-	public Player(GamePanel gp, KeyHandler keyH, MouseHandler mouseH) {
+	public Player(GamePanel gp, KeyHandler keyH, MouseHandler mouseH, Zombie zombie) {
 		this.gp = gp;
 		this.keyH = keyH;
 		this.mouseH = mouseH;
+		this.zombie = zombie;
 		
 		solidArea = new Rectangle();
 		solidArea.x = 3;
@@ -34,13 +36,13 @@ public class Player extends Entity{
 		worldX = 0;
 		worldY = 0;
 		
-		screenX = 400;
+		screenX = gp.tileSize*gp.maxScreenCol/2;
 		screenY = 400;
 		
 		SetDefaultValues();
 	}
 	public void SetDefaultValues () {
-		worldX = 0;
+		worldX = 520;
 		worldY = 0;
 		
 		floorHeight = 0;
@@ -69,6 +71,7 @@ public class Player extends Entity{
 	
 	//update or ticks function
 	public void update() {
+		if(health > 0) {
 		prevAction = null;
 		if(keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true) {
 			
@@ -144,62 +147,70 @@ public class Player extends Entity{
 		gp.cCollision.checkFloor(this);
 		
 		//mouse Listener
-		mouseListener();
+		mouseListener(zombie);
+		}
 	}
 	
 	public void draw(Graphics g2) {
 		
 		getPlayerImage();
 		BufferedImage image = null;
-
-		switch(direction) {
-		case "left" :
-			if(prevAction == "crouch" && keyH.downPressed) {
-				image = crouch_left;
-			}else if(prevAction == "punch" || punchDelay < 20) {
-				image = punch_place_left;
-			}else if(prevAction == "jump" && keyH.leftPressed == false) {
-				image = left;
-			}else if(spriteNum == 1) {
-				image = walk_1_left;
-			}else if(spriteNum == 2){
-				image = walk_2_jump_left;
-			}else if(spriteNum == 0){
-				image = left;
-			}
-			break;
-		case "right" :
-			if(prevAction == "crouch") {
-				image = crouch_right;
-			}else if(prevAction == "punch" || punchDelay < 20) {
-				image = punch_place_right;
-			}else if(prevAction == "jump" && keyH.rightPressed == false) {
-				image = right;
-			}else {
-				if(spriteNum == 1) {
-					image = walk_1_right;
-				}else if(spriteNum == 0){
-					image = right;
+		if(health > 0) {
+			switch(direction) {
+			case "left" :
+				if(prevAction == "crouch" && keyH.downPressed) {
+					image = crouch_left;
+				}else if(prevAction == "punch" || punchDelay < 20) {
+					image = punch_place_left;
+				}else if(prevAction == "jump" && keyH.leftPressed == false) {
+					image = left;
+				}else if(spriteNum == 1) {
+					image = walk_1_left;
 				}else if(spriteNum == 2){
-					image = walk_2_jump_right;
+					image = walk_2_jump_left;
+				}else if(spriteNum == 0){
+					image = left;
 				}
+				break;
+			case "right" :
+				if(prevAction == "crouch") {
+					image = crouch_right;
+				}else if(prevAction == "punch" || punchDelay < 20) {
+					image = punch_place_right;
+				}else if(prevAction == "jump" && keyH.rightPressed == false) {
+					image = right;
+				}else {
+					if(spriteNum == 1) {
+						image = walk_1_right;
+					}else if(spriteNum == 0){
+						image = right;
+					}else if(spriteNum == 2){
+						image = walk_2_jump_right;
+					}
+				}
+				break;
 			}
-			break;
+			
+			g2.drawImage(image, screenX, screenY, gp.tileSize, 2*gp.tileSize, null);
 		}
-		
-		g2.drawImage(image, screenX, screenY, gp.tileSize, 2*gp.tileSize, null);
 	}
 	
-	private void mouseListener() {
+	private void mouseListener(Entity entity) {
 		int blockScreenX = (mouseH.mouseX-screenX)/gp.tileSize;
 		int blockScreenY = (mouseH.mouseY-screenY)/gp.tileSize;
 		int blockWorldX = (mouseH.mouseX - screenX + worldX)/gp.tileSize;
 		int blockWorldY = (mouseH.mouseY - screenY + worldY)/gp.tileSize - 2 ; // - player height in blocks
 		
+		
 		punchDelay++;
 		if(mouseH.leftClicked) {
 			action = "punch";
-			if(blockScreenX < 5 && blockScreenY < 5 && 
+			if(zombie.screenX/gp.tileSize == mouseH.mouseX/gp.tileSize &&
+					(zombie.screenY/gp.tileSize == mouseH.mouseY/gp.tileSize 
+					|| zombie.screenY/gp.tileSize == mouseH.mouseY/gp.tileSize - 1 
+					|| zombie.screenY/gp.tileSize == mouseH.mouseY/gp.tileSize + 1))
+				hit(1,6, entity, gp);
+			else if(blockScreenX < 5 && blockScreenY < 5 && 
 					blockWorldX <= gp.maxWorldCol && blockWorldY <= gp.maxWorldRow &&
 					blockWorldX >= 0 && blockWorldY >= 0)
 				Tile.TileManager.breakBlock(blockScreenX, blockScreenY, blockWorldX, blockWorldY);
