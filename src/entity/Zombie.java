@@ -72,7 +72,7 @@ public class Zombie extends Entity{
 		
 		collisionOn = false;
 //		gp.cCollision.checkTile(this);
-		System.out.println(collisionOn);
+//		System.out.println(collisionOn);
 		//changing walking image based on keyHold
 		spriteCounter++;
 		

@@ -203,7 +203,9 @@ public class Player extends Entity{
 		punchDelay++;
 		if(mouseH.leftClicked) {
 			action = "punch";
-			if(blockScreenX < 5 && blockScreenY < 5)
+			if(blockScreenX < 5 && blockScreenY < 5 && 
+					blockWorldX <= gp.maxWorldCol && blockWorldY <= gp.maxWorldRow &&
+					blockWorldX >= 0 && blockWorldY >= 0)
 				Tile.TileManager.breakBlock(blockScreenX, blockScreenY, blockWorldX, blockWorldY);
 			mouseH.leftClicked = false;
 			punchDelay = 1;

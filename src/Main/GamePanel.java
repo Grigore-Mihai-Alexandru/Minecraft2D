@@ -25,8 +25,8 @@ public class GamePanel extends JPanel implements Runnable{
 
 
     //word settings
-    public final int maxWorldCol =100;
-    public final int maxWorldRow =100 ;
+    public final int maxWorldCol = 100;
+    public final int maxWorldRow = 100 ;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
     
@@ -38,15 +38,9 @@ public class GamePanel extends JPanel implements Runnable{
     public Player player = new Player(this, keyH, mouseH);
     public CollisionChecker cCollision = new CollisionChecker(this);
     EnvironmentManager eManager = new EnvironmentManager(this);
-	  public Zombie zombie = new Zombie(this);
+    public Zombie zombie = new Zombie(this);
 //	public MapGenerator generator = new MapGenerator();
     
-    
-    //player default position
-    
-    int playerX = 100;
-    int playerY = tileSize*(maxScreenRow - 1 );
-    int playerSpeed = 3;
     
     
     public GamePanel() {

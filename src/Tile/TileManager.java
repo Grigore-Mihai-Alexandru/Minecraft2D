@@ -14,8 +14,6 @@ public class TileManager {
 	public GamePanel gp;
 	public static Tile[] tile;
 	public static int mapTileNum[][];
-	int worldMaxCol;
-	int worldMaxRow;
 	
 	public TileManager (GamePanel gp) {
 		this.gp = gp;
@@ -98,13 +96,10 @@ public class TileManager {
 	            col = 0;
 	            row++;
 	        }
-	        worldMaxCol = gp.maxScreenCol;
-	        worldMaxRow = gp.maxScreenRow;
 	    }
   }
 	
 	public static void breakBlock(int screenX, int screenY, int col, int row) {
-		//handle outside of border case
 		if(mapTileNum[row][col] != 0 && tile[mapTileNum[row][col]].breakable)
 			mapTileNum[row][col] = 0;
 	}
