@@ -32,14 +32,18 @@ public class GamePanel extends JPanel implements Runnable{
     
     int FPS = 60;
     TileManager tileM = new TileManager(this);
+       Sound sound = new Sound();
     KeyHandler keyH = new KeyHandler();
+ 
     MouseHandler mouseH = new MouseHandler();
-    Thread gameThread;
+   
+  
     public Player player = new Player(this, keyH, mouseH);
     public CollisionChecker cCollision = new CollisionChecker(this);
     EnvironmentManager eManager = new EnvironmentManager(this);
     public Zombie zombie = new Zombie(this);
-//	public MapGenerator generator = new MapGenerator();
+    Thread gameThread;
+    //	public MapGenerator generator = new MapGenerator();
     
     
     
@@ -51,10 +55,14 @@ public class GamePanel extends JPanel implements Runnable{
         this.setFocusable(true);
         this.addMouseListener(mouseH);
     }
-    
+    public void setupGame() {
+    	playMusic(0);
+    	
+    }
     public void setup() {
         eManager = new EnvironmentManager(this); // Create an instance of EnvironmentManager
         eManager.setup(); // Call the setup method of EnvironmentManager
+   
     }
     
     
@@ -108,5 +116,24 @@ public class GamePanel extends JPanel implements Runnable{
         eManager.draw(g2); // Call the draw method of EnvironmentManager
         g2.dispose();
     }
-  
+  public void playMusic(int i) {
+	  
+	  sound.setFile(i);
+	  sound.play();
+	  sound.loop();
+	  
+	  
+  }
+  public void stopMusic() {
+	  
+	  sound.stop();
+  }
+
+public void playSE(int i) {
+	
+	
+sound.setFile(i);
+sound.play();
+}
+
 }
