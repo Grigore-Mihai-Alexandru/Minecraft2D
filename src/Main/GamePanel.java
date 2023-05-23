@@ -35,15 +35,15 @@ public class GamePanel extends JPanel implements Runnable{
     
     int FPS = 60;
     TileManager tileM = new TileManager(this);
-    KeyHandler keyH = new KeyHandler();
+    public MinecraftInventory inventory = new MinecraftInventory(36);
+    KeyHandler keyH = new KeyHandler(inventory);
     MouseHandler mouseH = new MouseHandler();
     Thread gameThread;
     public CollisionChecker cCollision = new CollisionChecker(this);
     EnvironmentManager eManager = new EnvironmentManager(this);
     public Zombie zombie = new Zombie(this);
-    public Player player = new Player(this, keyH, mouseH, zombie);
+    public Player player = new Player(this, keyH, mouseH, zombie, inventory);
     
-    public MinecraftInventory inventory = new MinecraftInventory(30);
     public UI ui = new UI(this, player);
     public Sound sound = new Sound();
 //	public MapGenerator generator = new MapGenerator(this);
@@ -112,7 +112,7 @@ public class GamePanel extends JPanel implements Runnable{
         player.draw(g2);
         zombie.draw(g2);
         eManager.draw(g2); // Call the draw method of EnvironmentManager
-        ui.draw(g2);
+        ui.draw(g2, keyH.inventoryActive);
         g2.dispose();
     }
     

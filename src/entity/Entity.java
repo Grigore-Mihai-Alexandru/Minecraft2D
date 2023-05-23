@@ -50,7 +50,10 @@ public class Entity {
 	}
 	
 	public void hit(int damage, int distance, Entity entity, GamePanel gp) {
-		if(distance >= Math.abs(worldX/gp.tileSize - entity.worldX/gp.tileSize) && entity.health > 0) {
+		if( (distance >= Math.abs(worldX/gp.tileSize - entity.worldX/gp.tileSize) &&
+				distance >= Math.abs(entity.floorHeight - floorHeight) ) &&
+				entity.health > 0) {
+			System.out.println(Math.abs(entity.floorHeight - floorHeight));
 			gp.playSE(0);
 			entity.health -= damage;
 		}
