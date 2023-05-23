@@ -7,6 +7,7 @@ public class MouseHandler implements MouseListener{
 	
 	public int mouseX, mouseY;
 	public boolean leftClicked = false;
+	public boolean rightClicked = false;
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -15,11 +16,12 @@ public class MouseHandler implements MouseListener{
 		if(button == MouseEvent.BUTTON1) {
 			leftClicked = true;
 			mouseX = e.getX();
-			mouseY = e.getY();			
-		}else if (button == MouseEvent.BUTTON2) {
-//            System.out.println("Middle mouse button clicked.");
-        } else if (button == MouseEvent.BUTTON3) {
-//            System.out.println("Right mouse button clicked.");
+			mouseY = e.getY();
+		}
+		if (button == MouseEvent.BUTTON3) {
+            rightClicked = true;
+			mouseX = e.getX();
+			mouseY = e.getY();
         }
 	}
 

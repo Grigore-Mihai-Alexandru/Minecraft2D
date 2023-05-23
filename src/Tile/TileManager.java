@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
 
+import Inventory.MinecraftHotbar;
+
 public class TileManager {
 	public GamePanel gp;
 	public static Tile[] tile;
@@ -99,9 +101,18 @@ public class TileManager {
 	    }
   }
 	
-	public static void breakBlock(int screenX, int screenY, int col, int row) {
+	public static int breakBlock(int screenX, int screenY, int col, int row) {
+		int aux = mapTileNum[row][col];
 		if(mapTileNum[row][col] != 0 && tile[mapTileNum[row][col]].breakable)
 			mapTileNum[row][col] = 0;
+		return aux;
 	}
-  
+	//place block logic here
+	
+	public static void placeBlock(int col, int row, int id) {
+		if(mapTileNum[row][col] == 0 ) {
+			mapTileNum[row][col] = id;
+		}
+	}
+	
 }	

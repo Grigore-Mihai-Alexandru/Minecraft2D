@@ -10,6 +10,9 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import Inventory.MinecraftHotbar;
+import Inventory.MinecraftInventory;
+
 
 public class Player extends Entity{
 
@@ -17,16 +20,19 @@ public class Player extends Entity{
 	KeyHandler keyH;
 	MouseHandler mouseH;
 	Zombie zombie;
+	public MinecraftInventory inventory = new MinecraftInventory(36);
 	public final int screenX;
 	public final int screenY;
 	private String prevAction;
 	private int punchDelay = 20;
+	private int placeDelay = 20;
 	
-	public Player(GamePanel gp, KeyHandler keyH, MouseHandler mouseH, Zombie zombie) {
+	public Player(GamePanel gp, KeyHandler keyH, MouseHandler mouseH, Zombie zombie, MinecraftInventory inventory) {
 		this.gp = gp;
 		this.keyH = keyH;
 		this.mouseH = mouseH;
 		this.zombie = zombie;
+		this.inventory = inventory;
 		
 		solidArea = new Rectangle();
 		solidArea.x = 3;
@@ -196,13 +202,15 @@ public class Player extends Entity{
 	}
 	
 	private void mouseListener(Entity entity) {
-		int blockScreenX = (mouseH.mouseX-screenX)/gp.tileSize;
-		int blockScreenY = (mouseH.mouseY-screenY)/gp.tileSize;
+		int blockScreenX = (mouseH.mouseX - screenX)/gp.tileSize;
+		int blockScreenY = (mouseH.mouseY - screenY)/gp.tileSize;
 		int blockWorldX = (mouseH.mouseX - screenX + worldX)/gp.tileSize;
 		int blockWorldY = (mouseH.mouseY - screenY + worldY)/gp.tileSize - 2 ; // - player height in blocks
 		
+		int blockId;
 		
 		punchDelay++;
+		placeDelay++;
 		if(mouseH.leftClicked) {
 			action = "punch";
 			if(zombie.screenX/gp.tileSize == mouseH.mouseX/gp.tileSize &&
@@ -212,13 +220,51 @@ public class Player extends Entity{
 				hit(1,6, entity, gp);
 			else if(blockScreenX < 5 && blockScreenY < 5 && 
 					blockWorldX <= gp.maxWorldCol && blockWorldY <= gp.maxWorldRow &&
-					blockWorldX >= 0 && blockWorldY >= 0)
-				Tile.TileManager.breakBlock(blockScreenX, blockScreenY, blockWorldX, blockWorldY);
+					blockWorldX >= 0 && blockWorldY >= 0) {
+				blockId = Tile.TileManager.breakBlock(blockScreenX, blockScreenY, blockWorldX, blockWorldY);
+				//add to inventory item
+				if(blockId != 0)
+					inventory.setItemFirstSlotAvailable(blockId,1);
+//				inventory.printInventory();
+			}
 			mouseH.leftClicked = false;
 			punchDelay = 1;
 		}
+//		right click logic
+		
+		int hotbarSlot = MinecraftHotbar.selectedSlot + 26;
+
+		if(mouseH.rightClicked  && MinecraftInventory.slots[hotbarSlot] != null  && placeDelay >=20) {
+			int hotbarSlotId = MinecraftInventory.slots[hotbarSlot].id;
+			action = "punch";
+			if(zombie.screenX/gp.tileSize != mouseH.mouseX/gp.tileSize &&
+					zombie.screenY/gp.tileSize != mouseH.mouseY/gp.tileSize &&
+					blockScreenX != screenX && blockScreenY != screenY) {	
+					if(blockScreenX < 5 && blockScreenY < 5 && 
+						blockWorldX <= gp.maxWorldCol && blockWorldY <= gp.maxWorldRow &&
+						blockWorldX >= 0 && blockWorldY >= 0) 
+					{
+						Tile.TileManager.placeBlock(blockWorldX,blockWorldY,
+								MinecraftInventory.slots[hotbarSlot].id);
+						//remove item from inventory
+						
+//						if(Tile.TileManager.mapTileNum[blockWorldX][blockWorldY] == 0)
+							gp.player.inventory.slots[hotbarSlot].quantity -= 1;
+						
+						
+						if(gp.player.inventory.slots[hotbarSlot].quantity == 0)
+							gp.player.inventory.slots[hotbarSlot] = null;
+					}
+				
+			}
+			mouseH.rightClicked = false;
+			placeDelay = 1;
+		}
+		
 		if(punchDelay > 1000)
 			punchDelay = 20;
+		if(placeDelay > 1000)
+			placeDelay = 20;
 	}
 	
 	//getters and setters
